@@ -127,7 +127,7 @@ def test_scoring_monocolor_1000():
     #                                  in your game there are duplicates; your engine allows duplicates because Tile equality includes both fields.)
     # Free: 5 blue
     #
-    # IMPORTANT: This assumes your game has duplicates per color/number (it does in remi pe tabla),
+    # IMPORTANT: This assumes your game has duplicates per color/number (it does in remi pe  tabla),
     # and your engine currently allows duplicates.
     hand15 = [
         t(R,1), t(R,2), t(R,3), t(R,4), t(R,5), t(R,6), t(R,7),
