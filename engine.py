@@ -1022,11 +1022,6 @@ def near_meld_score(hand, cov=None):
 
                 score += base
 
-        # Terminal wrap hints (very small)
-        if 12 in sset and 13 in sset:
-            score += 2.0
-        if 13 in sset and 1 in sset:
-            score += 0.5
 
     # ---- C) Set-to-run synergy (ONLY when it doesn't fake-progress) ----
     # This is the part that was overestimating B4 in your example.

@@ -1,4 +1,4 @@
-from engine import Tile, recommend_take_or_draw, recommend_action, recommend_turn_start
+from engine import Tile, recommend_take_or_draw, recommend_action, recommend_turn_start, recommend_after_drawing_deck
 
 R=0; B=1; K=2; Y=3
 J = Tile(-1,-1)
@@ -69,6 +69,7 @@ def run_strategy_tests():
     assert_eq(a["action"], "DISCARD", "Should DISCARD when no close exists")
     assert_true("discard_index" in a and "discard_tile" in a, "DISCARD should include discard_index and discard_tile")
 
+
     # 5) Turn-start wrapper: structure + required fields
     hand14 = [
         t(R, 1), t(R, 2), t(R, 3),
@@ -128,6 +129,19 @@ def run_strategy_tests():
     top_discard = t(R,8)
     d = recommend_take_or_draw(hand14, top_discard)
     assert_eq(d["action"], "TAKE_DISCARD", "Should TAKE discard that extends a strong near-run")
+
+    # 8) Regression: avoid overvaluing 12-13 adjacency; don't discard set-seed like K6 here
+    hand14 = [
+        t(Y, 13), t(R, 13), t(B, 13),
+        t(B, 1), t(K, 1), t(K, 3), t(B, 3),
+        t(Y, 2), t(Y, 4), t(R, 8),
+        t(B, 5), t(R, 5), t(R, 6), t(K, 6),
+    ]
+    drawn = t(Y, 12)
+    a = recommend_after_drawing_deck(hand14, drawn)
+
+    assert_eq(a["action"], "DISCARD", "Should discard after drawing when no close")
+    assert_true(a["discard_tile"] != t(K, 6), "Should not discard K6 here")
 
     print("All strategy tests passed.")
 
