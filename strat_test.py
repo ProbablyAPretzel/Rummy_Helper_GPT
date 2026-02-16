@@ -48,6 +48,12 @@ def run_strategy_tests():
     # Make a known 500 minors close with free joker.
     hand15 = base14 + [J]  # joker free -> x2 on 500? (but base is 500; free joker doubles to 1000)
     a = recommend_action(hand15, joker_discarded_earlier=False)
+    from engine import best_close_plan, evaluate_close
+    print("DEBUG hand15:", hand15)
+    print("DEBUG best_close_plan:", best_close_plan(hand15))
+    print("DEBUG evaluate_close:", evaluate_close(hand15))
+    print("DEBUG recommend_action:", a)
+
     assert_eq(a["action"], "CLOSE", "Should CLOSE when a big close is available")
 
     # 4) If no close is available, recommend_action should DISCARD

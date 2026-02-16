@@ -430,19 +430,28 @@ def best_close_plan(hand, joker_discarded_earlier=False):
         return None
 
     full = (1 << 15) - 1
-    _, dp_min, _ = get_hand_dp(hand)
+
+    # IMPORTANT: get index mapping so DP bit positions match original hand indices
+    _tiles_dp, orig_to_dp, dp_min, _dp_cov = get_hand_dp(
+        hand,
+        allow_joker_melds=True,     # allow jokers in melds, then apply your policy filter below
+        need_index_map=True
+    )
 
     best = None
+
     for i in range(15):
-        nonfree_mask = full ^ (1 << i)
+        dp_i = orig_to_dp[i]                 # map original index -> dp index
+        nonfree_mask = full ^ (1 << dp_i)    # remove the FREE tile in DP-space
+
         jokers_used = dp_min[nonfree_mask]
         if jokers_used >= INF:
             continue
 
         free_tile = hand[i]
-
-        # base category from the actual 14 tiles (build list)
         nonfree_tiles = [hand[j] for j in range(15) if j != i]
+
+        # Determine base category from actual 14 tiles
         if _is_monocolor(nonfree_tiles):
             base = 1000
         elif _is_minors(nonfree_tiles) or _is_majors(nonfree_tiles) or _is_bicolor(nonfree_tiles):
@@ -457,13 +466,16 @@ def best_close_plan(hand, joker_discarded_earlier=False):
             mult = 4 if joker_discarded_earlier else 2
 
         score = base_after_penalty * mult
-        # Personal policy: avoid using joker(s) inside melds unless the resulting close is > 500
+
+        # Your personal policy: avoid joker(s) inside melds unless resulting close is > 500
         if jokers_used > 0 and score <= 500:
             continue
+
         if best is None or score > best["score"]:
             best = {"free_index": i, "free_tile": free_tile, "score": score}
 
     return best
+
 
 
 def recommend_action_after_draw(hand, joker_discarded_earlier=False):
